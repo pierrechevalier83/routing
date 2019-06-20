@@ -113,6 +113,11 @@ impl PeerMap {
     pub fn get_connection_info<'a>(&'a self, pub_id: &PublicId) -> Option<&'a ConnectionInfo> {
         self.forward.get(pub_id)
     }
+
+    // Find public id of the peer with the given socket address.
+    pub fn get_public_id<'a>(&'a self, socket_addr: &SocketAddr) -> Option<&'a PublicId> {
+        self.reverse.get(socket_addr)
+    }
 }
 
 enum PendingConnection {
