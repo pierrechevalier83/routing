@@ -150,6 +150,11 @@ pub trait Base: Display {
                 error!("{} - Unhandled UnsentUserMessage", self);
                 Transition::Stay
             }
+            SentUserMessage { .. } => {
+                // TODO (quic-p2p): handle sent messages
+                error!("{} - Unhandled SentUserMessage", self);
+                Transition::Stay
+            }
             Finish => Transition::Terminate,
         };
 
