@@ -148,11 +148,7 @@ pub trait Base: Display {
             UnsentUserMessage { peer_addr, msg } => {
                 self.handle_unsent_bytes(peer_addr, msg, outbox)
             }
-            SentUserMessage { .. } => {
-                // TODO (quic-p2p): handle sent messages
-                error!("{} - Unhandled SentUserMessage", self);
-                Transition::Stay
-            }
+            SentUserMessage { peer_addr, msg } => self.handle_sent_bytes(peer_addr, msg, outbox),
             Finish => Transition::Terminate,
         };
 
@@ -287,6 +283,53 @@ pub trait Base: Display {
     }
 
     fn handle_unsent_direct_message(
+        &mut self,
+        msg: SignedDirectMessage,
+        _: &mut EventBox,
+    ) -> Result<Transition, RoutingError> {
+        warn!("{} Unsent direct message {:?}", self, msg);
+        Ok(Transition::Stay)
+    }
+
+    fn handle_sent_bytes(
+        &mut self,
+        peer_addr: SocketAddr,
+        bytes: NetworkBytes,
+        outbox: &mut EventBox,
+    ) -> Transition {
+        let result = from_network_bytes(bytes)
+            .and_then(|message| self.handle_sent_message(peer_addr, message, outbox));
+
+        match result {
+            Ok(transition) => transition,
+            Err(err) => {
+                debug!("{} - {:?}", self, err);
+                Transition::Stay
+            }
+        }
+    }
+
+    fn handle_sent_message(
+        &mut self,
+        _peer_addr: SocketAddr,
+        _msg: Message,
+        _outbox: &mut EventBox,
+    ) -> Result<Transition, RoutingError> {
+        // TODO figure out what to do in base and in derived implementations
+        Ok(Transition::Stay)
+    }
+
+    fn handle_sent_hop_message(
+        &mut self,
+        peer_id: PublicId,
+        msg: HopMessage,
+        _: &mut EventBox,
+    ) -> Result<Transition, RoutingError> {
+        warn!("{} Unsent hop message to {:?}: {:?}", self, peer_id, msg);
+        Ok(Transition::Stay)
+    }
+
+    fn handle_sent_direct_message(
         &mut self,
         msg: SignedDirectMessage,
         _: &mut EventBox,
