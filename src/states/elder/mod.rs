@@ -6,11 +6,11 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
-mod sending_targets_cache;
+//mod sending_targets_cache;
 #[cfg(all(test, feature = "mock_parsec"))]
 mod tests;
 
-use self::sending_targets_cache::SendingTargetsCache;
+//use self::sending_targets_cache::SendingTargetsCache;
 use super::common::{Approved, Base, Bootstrapped, Relocated};
 use crate::{
     cache::Cache,
